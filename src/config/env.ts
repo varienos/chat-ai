@@ -112,7 +112,7 @@ export function loadConfig(
       sessionIdleTimeoutMs: parseInt(env.SESSION_IDLE_TIMEOUT_MS ?? "1800000", 10),
       systemPrompt:
         env.SYSTEM_PROMPT ??
-        "You answer customer questions about mobile app development projects. Do not use tools or make file changes.",
+        "You are a customer support assistant. Stay on topic and never generate code or content unrelated to the business you serve.",
     },
     claude: {
       binaryPath: env.CLAUDE_BINARY_PATH ?? "claude",

@@ -95,28 +95,38 @@ git clone https://github.com/varienos/chat-ai.git
 cd chat-ai
 
 cp .env.example .env
-# Edit .env — set API_AUTH_TOKEN, DECK_ADMIN_PASSWORD, DECK_JWT_SECRET
-# (use `openssl rand -hex 32` for each)
+# Edit .env — replace the placeholder values for:
+#   API_AUTH_TOKEN, DECK_ADMIN_PASSWORD, DECK_JWT_SECRET
+# Generate strong values with: openssl rand -hex 32
 
 docker compose up --build
 ```
 
-Then open:
+Then verify the stack is up:
 
-- **Widget demo:** http://localhost:3000/
-- **Admin panel:** http://localhost:3000/deck
-- **API docs:** http://localhost:3000/docs
-- **Health check:** http://localhost:3000/health
+- **Health check:** http://localhost:3000/health → `{"status":"ok"}`
+- **Admin panel:** http://localhost:3000/deck → login with `DECK_ADMIN_USER` / `DECK_ADMIN_PASSWORD`
+- **API docs (Swagger UI):** http://localhost:3000/docs
+
+> ℹ️ **There is no auto-served widget demo page.** To test the widget,
+> either drop the `<script>` tag from the [Embed the Widget](#embed-the-widget)
+> section into any local HTML file, or use the live test console at
+> **Deck → Chat**.
 
 For host-native development on macOS (faster than Docker for the gateway):
 
 ```bash
 npm install
-npm run dev                    # gateway in watch mode (port 3000)
-npm run dev:deck               # deck panel (port 5173)
-npm run local:host:start       # start postgres + redis only
+npm run local:host:start       # 1. start postgres + redis (Docker, in background)
+npm run dev                    # 2. gateway in watch mode (port 3000)
+npm run dev:deck               # 3. deck panel in another terminal (port 5173)
+
+# When done:
 npm run local:host:stop
 ```
+
+> The gateway will fail to start if PostgreSQL / Redis aren't running yet —
+> always run `local:host:start` first.
 
 ## Embed the Widget
 
@@ -315,6 +325,16 @@ GET https://your-domain/deck        → admin login screen
 `docker-compose.yml` is the default local stack (gateway + postgres + redis).
 For production behind your own reverse proxy, point a TLS terminator at
 container port `3000` and set the same env vars listed above.
+
+### Multi-architecture builds
+
+If you're deploying to AMD64 hardware from an Apple Silicon (ARM64) machine,
+overlay [`docker-compose.gateway-amd64.yml`](docker-compose.gateway-amd64.yml)
+to force a `linux/amd64` build:
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.gateway-amd64.yml build
+```
 
 ## Tech Stack
 
