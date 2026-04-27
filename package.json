@@ -1,0 +1,76 @@
+{
+  "name": "varien-ai-gateway",
+  "version": "0.1.0",
+  "description": "Embeddable, multi-provider AI chat assistant gateway (Codex / Claude / Gemini) with knowledge base and admin panel.",
+  "private": true,
+  "license": "MIT",
+  "author": {
+    "name": "Yiğit Can H.",
+    "email": "yigitcan@varien.com.tr",
+    "url": "https://varien.software"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/varienos/chat-ai.git"
+  },
+  "homepage": "https://github.com/varienos/chat-ai#readme",
+  "bugs": {
+    "url": "https://github.com/varienos/chat-ai/issues"
+  },
+  "keywords": [
+    "ai",
+    "chatbot",
+    "llm",
+    "gateway",
+    "fastify",
+    "openai",
+    "codex",
+    "claude",
+    "gemini",
+    "embeddable-widget",
+    "knowledge-base",
+    "sse",
+    "typescript"
+  ],
+  "type": "module",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsx watch src/server.ts",
+    "local:host:start": "bash scripts/start-local-host-fallback.sh",
+    "local:host:status": "bash scripts/status-local-host-fallback.sh",
+    "local:host:stop": "bash scripts/stop-local-host-fallback.sh",
+    "openapi:export": "tsx scripts/export-openapi.ts",
+    "postman:export": "tsx scripts/export-postman.ts",
+    "smoke": "node scripts/smoke.mjs",
+    "start": "node dist/src/server.js",
+    "test": "vitest run",
+    "build:deck": "cd deck && npm ci && npm run build",
+    "build:all": "npm run build && npm run build:deck",
+    "dev:deck": "cd deck && npm run dev"
+  },
+  "dependencies": {
+    "@fastify/static": "^9.0.0",
+    "@fastify/swagger": "^9.7.0",
+    "@fastify/swagger-ui": "^5.2.5",
+    "fastify": "^5.2.1",
+    "geoip-lite": "^2.0.0",
+    "jsonwebtoken": "^9.0.3",
+    "pg": "^8.14.1",
+    "redis": "^5.6.0",
+    "ua-parser-js": "^2.0.9"
+  },
+  "devDependencies": {
+    "@types/geoip-lite": "^1.4.4",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^24.0.0",
+    "@types/pg": "^8.15.1",
+    "@types/ua-parser-js": "^0.7.39",
+    "openapi-to-postmanv2": "^6.0.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.8.3",
+    "vitest": "^3.0.8"
+  }
+}

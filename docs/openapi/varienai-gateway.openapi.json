@@ -1,0 +1,889 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "description": "Codex-first CLI-to-API gateway for customer-facing mobile app development conversations.\n\nProtected routes require `Authorization: Bearer <API_AUTH_TOKEN>`.\nIn Swagger UI, click `Authorize` and paste only the raw `API_AUTH_TOKEN` value. Do not type the `Bearer ` prefix manually.\n\nCodex can be authenticated either through shared OAuth bootstrap or an explicit OpenAI API key when `CODEX_AUTH_MODE=api_key` is configured.",
+    "title": "VarienAI Gateway API",
+    "version": "0.1.0"
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "description": "Gateway bearer token for protected routes. Paste only the raw API_AUTH_TOKEN value into Swagger UI; the UI will add the `Bearer` prefix automatically.",
+        "bearerFormat": "opaque",
+        "scheme": "bearer",
+        "type": "http"
+      }
+    },
+    "schemas": {}
+  },
+  "paths": {
+    "/health": {
+      "get": {
+        "summary": "Get liveness and dependency health",
+        "tags": [
+          "Runtime"
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "dependencies": {
+                      "additionalProperties": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "reason": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "status": {
+                            "enum": [
+                              "up",
+                              "down"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "status"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "object"
+                    },
+                    "status": {
+                      "type": "string",
+                      "example": "ok"
+                    }
+                  },
+                  "required": [
+                    "status"
+                  ],
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "dependencies": {
+                      "additionalProperties": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "reason": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "status": {
+                            "enum": [
+                              "up",
+                              "down"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "status"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "object"
+                    },
+                    "status": {
+                      "type": "string",
+                      "example": "ok"
+                    }
+                  },
+                  "required": [
+                    "status"
+                  ],
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ready": {
+      "get": {
+        "summary": "Get readiness and provider auth state",
+        "tags": [
+          "Runtime"
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "dependencies": {
+                      "additionalProperties": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "reason": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "status": {
+                            "enum": [
+                              "up",
+                              "down"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "status"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "object"
+                    },
+                    "status": {
+                      "type": "string",
+                      "example": "ok"
+                    }
+                  },
+                  "required": [
+                    "status"
+                  ],
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "dependencies": {
+                      "additionalProperties": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "reason": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "status": {
+                            "enum": [
+                              "up",
+                              "down"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "status"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "object"
+                    },
+                    "status": {
+                      "type": "string",
+                      "example": "ok"
+                    }
+                  },
+                  "required": [
+                    "status"
+                  ],
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/metrics": {
+      "get": {
+        "summary": "Get provider metrics snapshot",
+        "tags": [
+          "Runtime"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "generatedAt": {
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "providers": {
+                      "additionalProperties": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "activeRequests": {
+                            "type": "integer"
+                          },
+                          "activeSessions": {
+                            "type": "integer"
+                          },
+                          "averageLatencyMs": {
+                            "type": "number"
+                          },
+                          "errorCount": {
+                            "type": "integer"
+                          },
+                          "errorRate": {
+                            "type": "number"
+                          },
+                          "timeoutCount": {
+                            "type": "integer"
+                          },
+                          "totalRequests": {
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "activeRequests",
+                          "activeSessions",
+                          "averageLatencyMs",
+                          "errorCount",
+                          "errorRate",
+                          "timeoutCount",
+                          "totalRequests"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "generatedAt",
+                    "providers"
+                  ],
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/providers": {
+      "get": {
+        "summary": "List enabled providers",
+        "tags": [
+          "Providers"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "defaultProvider": {
+                      "enum": [
+                        "codex",
+                        "gemini",
+                        "claude"
+                      ],
+                      "type": "string"
+                    },
+                    "providers": {
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "enabled": {
+                            "type": "boolean"
+                          },
+                          "name": {
+                            "enum": [
+                              "codex",
+                              "gemini",
+                              "claude"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "name",
+                          "enabled"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "defaultProvider",
+                    "providers"
+                  ],
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/providers/{provider}/login-status": {
+      "post": {
+        "summary": "Check provider auth status",
+        "tags": [
+          "Providers"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "provider",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "authenticated": {
+                      "type": "boolean"
+                    },
+                    "mode": {
+                      "enum": [
+                        "oauth",
+                        "api_key"
+                      ],
+                      "type": "string"
+                    },
+                    "provider": {
+                      "enum": [
+                        "codex",
+                        "gemini",
+                        "claude"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "provider",
+                    "authenticated",
+                    "mode"
+                  ],
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ],
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/session": {
+      "post": {
+        "summary": "Create a chat session",
+        "tags": [
+          "Sessions"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "provider": {
+                    "type": "string",
+                    "example": "codex"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "createdAt": {
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "lastActivityAt": {
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "messageCount": {
+                      "type": "integer"
+                    },
+                    "provider": {
+                      "enum": [
+                        "codex",
+                        "gemini",
+                        "claude"
+                      ],
+                      "type": "string"
+                    },
+                    "status": {
+                      "enum": [
+                        "active"
+                      ],
+                      "type": "string"
+                    },
+                    "summary": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "provider",
+                    "status",
+                    "createdAt",
+                    "lastActivityAt",
+                    "messageCount",
+                    "summary"
+                  ],
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/session/{id}": {
+      "get": {
+        "summary": "Fetch a session by id",
+        "tags": [
+          "Sessions"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "createdAt": {
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "lastActivityAt": {
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "messageCount": {
+                      "type": "integer"
+                    },
+                    "provider": {
+                      "enum": [
+                        "codex",
+                        "gemini",
+                        "claude"
+                      ],
+                      "type": "string"
+                    },
+                    "status": {
+                      "enum": [
+                        "active"
+                      ],
+                      "type": "string"
+                    },
+                    "summary": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "provider",
+                    "status",
+                    "createdAt",
+                    "lastActivityAt",
+                    "messageCount",
+                    "summary"
+                  ],
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ],
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/chat": {
+      "post": {
+        "summary": "Send a chat message and wait for the final response",
+        "tags": [
+          "Chat"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "message": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "provider": {
+                    "type": "string",
+                    "example": "codex"
+                  },
+                  "sessionId": {
+                    "minLength": 1,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "message",
+                  "sessionId"
+                ],
+                "type": "object"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "message": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "content": {
+                          "type": "string"
+                        },
+                        "createdAt": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "id": {
+                          "type": "string"
+                        },
+                        "latencyMs": {
+                          "nullable": true,
+                          "type": "number"
+                        },
+                        "metadata": {
+                          "additionalProperties": true,
+                          "type": "object"
+                        },
+                        "provider": {
+                          "enum": [
+                            "codex",
+                            "gemini",
+                            "claude"
+                          ],
+                          "type": "string"
+                        },
+                        "role": {
+                          "enum": [
+                            "assistant",
+                            "user"
+                          ],
+                          "type": "string"
+                        },
+                        "sessionId": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "sessionId",
+                        "role",
+                        "content",
+                        "createdAt",
+                        "provider",
+                        "metadata"
+                      ],
+                      "type": "object"
+                    },
+                    "provider": {
+                      "enum": [
+                        "codex",
+                        "gemini",
+                        "claude"
+                      ],
+                      "type": "string"
+                    },
+                    "sessionId": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "sessionId",
+                    "provider",
+                    "message"
+                  ],
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ],
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ],
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ],
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ],
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/chat/stream": {
+      "post": {
+        "summary": "Send a chat message and stream the response over SSE",
+        "tags": [
+          "Chat"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "message": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "provider": {
+                    "type": "string",
+                    "example": "codex"
+                  },
+                  "sessionId": {
+                    "minLength": 1,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "message",
+                  "sessionId"
+                ],
+                "type": "object"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Server-Sent Events stream. Events may include session.started, assistant.delta, assistant.completed, and error.",
+            "content": {
+              "text/event-stream": {
+                "schema": {
+                  "example": "event: session.started\ndata: {\"sessionId\":\"ses_123\"}\n\nevent: assistant.delta\ndata: {\"sessionId\":\"ses_123\",\"chunk\":\"Merhaba\"}\n\nevent: assistant.completed\ndata: {\"sessionId\":\"ses_123\",\"provider\":\"codex\",\"message\":{\"id\":\"msg_123\",\"role\":\"assistant\",\"content\":\"Merhaba\"}}\n\n",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "description": "Liveness, readiness, and metrics endpoints",
+      "name": "Runtime"
+    },
+    {
+      "description": "Provider capability and auth inspection endpoints",
+      "name": "Providers"
+    },
+    {
+      "description": "Session lifecycle endpoints",
+      "name": "Sessions"
+    },
+    {
+      "description": "Chat and streaming conversation endpoints",
+      "name": "Chat"
+    }
+  ]
+}

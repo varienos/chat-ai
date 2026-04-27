@@ -1,0 +1,38 @@
+{
+  "name": "varien-chat-widget",
+  "version": "1.0.0",
+  "description": "Embeddable AI chat widget — single-script-tag install, paired with the AI Chat Gateway.",
+  "private": true,
+  "license": "MIT",
+  "author": {
+    "name": "Yiğit Can H.",
+    "email": "yigitcan@varien.com.tr",
+    "url": "https://varien.software"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/varienos/chat-ai.git",
+    "directory": "widget"
+  },
+  "homepage": "https://github.com/varienos/chat-ai#readme",
+  "bugs": {
+    "url": "https://github.com/varienos/chat-ai/issues"
+  },
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build --mode production",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.14.0",
+    "@vitejs/plugin-react": "^5.0.0",
+    "terser": "^5.37.0",
+    "typescript": "~5.8.2",
+    "vite": "^6.2.0"
+  }
+}

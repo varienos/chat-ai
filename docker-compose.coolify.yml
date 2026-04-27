@@ -1,0 +1,114 @@
+# Coolify production deployment for chat.varien.software
+#
+# Usage in Coolify:
+#   - Repository: this repo
+#   - Compose file: docker-compose.coolify.yml
+#   - Domain: chat.varien.software  (set in Coolify UI)
+#
+# Required environment variables (set as Coolify secrets):
+#   API_AUTH_TOKEN          — long random token for gateway auth
+#   CODEX_AUTH_JSON         — contents of ~/.codex/auth.json from a logged-in machine
+#   DATABASE_URL            — from Coolify-attached PostgreSQL resource
+#   REDIS_URL               — from Coolify-attached Redis resource
+#   DECK_ADMIN_PASSWORD     — password for Deck admin panel login
+#   DECK_JWT_SECRET         — secret for Deck JWT token signing
+#
+# Optional:
+#   GEMINI_AUTH_JSON        — contents of ~/.gemini/oauth_creds.json
+#   CLAUDE_AUTH_JSON        — contents of ~/.claude/.credentials.json
+#   ENABLED_PROVIDERS       — comma-separated: codex,gemini,claude (default: codex)
+#   DEFAULT_PROVIDER        — codex | gemini | claude (default: codex)
+#   SYSTEM_PROMPT           — override the default system prompt
+#   CODEX_MODEL             — model to use, e.g. gpt-5.4 (default: gpt-5.4)
+
+services:
+  gateway:
+    build:
+      context: .
+      target: runtime
+    restart: unless-stopped
+    environment:
+      HOST: 0.0.0.0
+      PORT: 3000
+      NODE_ENV: production
+      DATABASE_URL: ${DATABASE_URL}
+      REDIS_URL: ${REDIS_URL}
+      API_AUTH_TOKEN: ${API_AUTH_TOKEN:?required}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      DEFAULT_PROVIDER: ${DEFAULT_PROVIDER:-codex}
+      ENABLED_PROVIDERS: ${ENABLED_PROVIDERS:-codex}
+      RECENT_MESSAGE_LIMIT: ${RECENT_MESSAGE_LIMIT:-12}
+      SYSTEM_PROMPT: ${SYSTEM_PROMPT:-You answer customer questions about mobile app development projects. Do not use tools or make file changes.}
+      RATE_LIMIT_MAX_REQUESTS: ${RATE_LIMIT_MAX_REQUESTS:-30}
+      RATE_LIMIT_WINDOW_MS: ${RATE_LIMIT_WINDOW_MS:-60000}
+      REQUEST_BODY_LIMIT_BYTES: ${REQUEST_BODY_LIMIT_BYTES:-1048576}
+      # Codex
+      CODEX_AUTH_MODE: ${CODEX_AUTH_MODE:-oauth}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      CODEX_BINARY_PATH: ${CODEX_BINARY_PATH:-codex}
+      CODEX_WORKING_DIRECTORY: ${CODEX_WORKING_DIRECTORY:-/app}
+      CODEX_MODEL: ${CODEX_MODEL:-gpt-5.4}
+      CODEX_ENABLE_DANGEROUS_BYPASS: ${CODEX_ENABLE_DANGEROUS_BYPASS:-false}
+      CODEX_SANDBOX: ${CODEX_SANDBOX:-read-only}
+      CODEX_SKIP_GIT_REPO_CHECK: ${CODEX_SKIP_GIT_REPO_CHECK:-true}
+      CODEX_TIMEOUT_MS: ${CODEX_TIMEOUT_MS:-120000}
+      # Auth JSON injection — set these as Coolify secrets
+      CODEX_AUTH_JSON: ${CODEX_AUTH_JSON:-}
+      GEMINI_AUTH_JSON: ${GEMINI_AUTH_JSON:-}
+      CLAUDE_AUTH_JSON: ${CLAUDE_AUTH_JSON:-}
+      # Gemini
+      GEMINI_BINARY_PATH: ${GEMINI_BINARY_PATH:-gemini}
+      GEMINI_WORKING_DIRECTORY: ${GEMINI_WORKING_DIRECTORY:-/app}
+      GEMINI_APPROVAL_MODE: ${GEMINI_APPROVAL_MODE:-plan}
+      GEMINI_SANDBOX: ${GEMINI_SANDBOX:-false}
+      GEMINI_TIMEOUT_MS: ${GEMINI_TIMEOUT_MS:-120000}
+      # Deck admin panel
+      DECK_ADMIN_USER: ${DECK_ADMIN_USER:-admin}
+      DECK_ADMIN_PASSWORD: ${DECK_ADMIN_PASSWORD:?required}
+      DECK_JWT_SECRET: ${DECK_JWT_SECRET:?required}
+      # Claude
+      CLAUDE_BINARY_PATH: ${CLAUDE_BINARY_PATH:-claude}
+      CLAUDE_WORKING_DIRECTORY: ${CLAUDE_WORKING_DIRECTORY:-/app}
+      CLAUDE_PERMISSION_MODE: ${CLAUDE_PERMISSION_MODE:-plan}
+      CLAUDE_INCLUDE_PARTIAL_MESSAGES: ${CLAUDE_INCLUDE_PARTIAL_MESSAGES:-true}
+      CLAUDE_TIMEOUT_MS: ${CLAUDE_TIMEOUT_MS:-120000}
+      # Knowledge base
+      KNOWLEDGE_BASE_PATH: /app/knowledge
+      KNOWLEDGE_SYNC_ON_DEPLOY: ${KNOWLEDGE_SYNC_ON_DEPLOY:-true}
+    volumes:
+      - knowledge-data:/app/knowledge
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:3000/health').then((r)=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    labels:
+      - traefik.enable=true
+      # HTTPS router
+      - traefik.http.routers.varien-gateway.rule=Host(`chat.varien.software`)
+      - traefik.http.routers.varien-gateway.entrypoints=https
+      - traefik.http.routers.varien-gateway.tls=true
+      - traefik.http.routers.varien-gateway.tls.certresolver=letsencrypt
+      - traefik.http.services.varien-gateway.loadbalancer.server.port=3000
+      - traefik.http.services.varien-gateway.loadbalancer.server.scheme=http
+      # HTTP → HTTPS redirect
+      - traefik.http.routers.varien-gateway-http.rule=Host(`chat.varien.software`)
+      - traefik.http.routers.varien-gateway-http.entrypoints=http
+      - traefik.http.routers.varien-gateway-http.middlewares=gateway-redirect-https@docker
+      - traefik.http.middlewares.gateway-redirect-https.redirectscheme.scheme=https
+    networks:
+      - coolify
+
+volumes:
+  knowledge-data:
+
+networks:
+  coolify:
+    external: true

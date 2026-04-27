@@ -1,0 +1,145 @@
+services:
+  gateway:
+    build:
+      context: .
+      target: runtime
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-postgresql://postgres:postgres@postgres:5432/varienai}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379}
+      DEFAULT_PROVIDER: ${DEFAULT_PROVIDER:-codex}
+      ENABLED_PROVIDERS: ${ENABLED_PROVIDERS:-codex}
+      CLAUDE_BINARY_PATH: ${CLAUDE_BINARY_PATH:-claude}
+      CLAUDE_INCLUDE_PARTIAL_MESSAGES: ${CLAUDE_INCLUDE_PARTIAL_MESSAGES:-true}
+      CLAUDE_PERMISSION_MODE: ${CLAUDE_PERMISSION_MODE:-plan}
+      CLAUDE_TIMEOUT_MS: ${CLAUDE_TIMEOUT_MS:-60000}
+      CLAUDE_WORKING_DIRECTORY: ${CLAUDE_WORKING_DIRECTORY:-/app}
+      CODEX_WORKING_DIRECTORY: ${CODEX_WORKING_DIRECTORY:-/app}
+      CODEX_BINARY_PATH: ${CODEX_BINARY_PATH:-codex}
+      CODEX_MODEL: ${CODEX_MODEL:-gpt-5.4}
+      CODEX_SANDBOX: ${CODEX_SANDBOX:-read-only}
+      CODEX_SKIP_GIT_REPO_CHECK: ${CODEX_SKIP_GIT_REPO_CHECK:-true}
+      CODEX_TIMEOUT_MS: ${CODEX_TIMEOUT_MS:-60000}
+      GEMINI_APPROVAL_MODE: ${GEMINI_APPROVAL_MODE:-plan}
+      GEMINI_BINARY_PATH: ${GEMINI_BINARY_PATH:-gemini}
+      GEMINI_SANDBOX: ${GEMINI_SANDBOX:-false}
+      GEMINI_TIMEOUT_MS: ${GEMINI_TIMEOUT_MS:-60000}
+      GEMINI_WORKING_DIRECTORY: ${GEMINI_WORKING_DIRECTORY:-/app}
+      HOST: 0.0.0.0
+      PORT: 3000
+      RECENT_MESSAGE_LIMIT: ${RECENT_MESSAGE_LIMIT:-12}
+      SYSTEM_PROMPT: ${SYSTEM_PROMPT:-You answer customer questions about mobile app development projects. Do not use tools or make file changes.}
+      DECK_ADMIN_USER: ${DECK_ADMIN_USER:-admin}
+      DECK_ADMIN_PASSWORD: ${DECK_ADMIN_PASSWORD:?required}
+      DECK_JWT_SECRET: ${DECK_JWT_SECRET:?required}
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:3000/health').then((response)=>process.exit(response.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    ports:
+      - "${GATEWAY_PORT:-3000}:3000"
+    volumes:
+      - codex-auth:/root/.codex
+      - gemini-auth:/root/.gemini
+      - claude-auth:/root/.claude
+
+  gateway-dev:
+    build:
+      context: .
+      target: dev
+    profiles: ["dev"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-postgresql://postgres:postgres@postgres:5432/varienai}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379}
+      DEFAULT_PROVIDER: ${DEFAULT_PROVIDER:-codex}
+      ENABLED_PROVIDERS: ${ENABLED_PROVIDERS:-codex}
+      CLAUDE_BINARY_PATH: ${CLAUDE_BINARY_PATH:-claude}
+      CLAUDE_INCLUDE_PARTIAL_MESSAGES: ${CLAUDE_INCLUDE_PARTIAL_MESSAGES:-true}
+      CLAUDE_PERMISSION_MODE: ${CLAUDE_PERMISSION_MODE:-plan}
+      CLAUDE_TIMEOUT_MS: ${CLAUDE_TIMEOUT_MS:-60000}
+      CLAUDE_WORKING_DIRECTORY: ${CLAUDE_WORKING_DIRECTORY:-/app}
+      CODEX_WORKING_DIRECTORY: ${CODEX_WORKING_DIRECTORY:-/app}
+      CODEX_BINARY_PATH: ${CODEX_BINARY_PATH:-codex}
+      CODEX_MODEL: ${CODEX_MODEL:-gpt-5.4}
+      CODEX_SANDBOX: ${CODEX_SANDBOX:-read-only}
+      CODEX_SKIP_GIT_REPO_CHECK: ${CODEX_SKIP_GIT_REPO_CHECK:-true}
+      CODEX_TIMEOUT_MS: ${CODEX_TIMEOUT_MS:-60000}
+      GEMINI_APPROVAL_MODE: ${GEMINI_APPROVAL_MODE:-plan}
+      GEMINI_BINARY_PATH: ${GEMINI_BINARY_PATH:-gemini}
+      GEMINI_SANDBOX: ${GEMINI_SANDBOX:-false}
+      GEMINI_TIMEOUT_MS: ${GEMINI_TIMEOUT_MS:-60000}
+      GEMINI_WORKING_DIRECTORY: ${GEMINI_WORKING_DIRECTORY:-/app}
+      HOST: 0.0.0.0
+      PORT: 3000
+      RECENT_MESSAGE_LIMIT: ${RECENT_MESSAGE_LIMIT:-12}
+      SYSTEM_PROMPT: ${SYSTEM_PROMPT:-You answer customer questions about mobile app development projects. Do not use tools or make file changes.}
+      DECK_ADMIN_USER: ${DECK_ADMIN_USER:-admin}
+      DECK_ADMIN_PASSWORD: ${DECK_ADMIN_PASSWORD:?required}
+      DECK_JWT_SECRET: ${DECK_JWT_SECRET:?required}
+    entrypoint: ["/bin/sh", "/app/scripts/dev-entrypoint.sh"]
+    ports:
+      - "${GATEWAY_DEV_PORT:-3001}:3000"
+    volumes:
+      - ./:/app
+      - gateway-node-modules:/app/node_modules
+      - codex-auth:/root/.codex
+      - gemini-auth:/root/.gemini
+      - claude-auth:/root/.claude
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis-data:/data
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: varienai
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d varienai"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+volumes:
+  claude-auth:
+  codex-auth:
+  gemini-auth:
+  gateway-node-modules:
+  postgres-data:
+  redis-data:

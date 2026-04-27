@@ -1,0 +1,99 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Environment — never commit secrets
+.env
+.env.local
+.env.*.local
+
+# macOS
+.DS_Store
+**/.DS_Store
+
+# Runtime state — PID files, logs, host fallback artifacts
+.local/
+
+# Editor / IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*.orig
+
+# Logs
+*.log
+npm-debug.log*
+
+# Test coverage
+coverage/
+
+# TypeScript incremental build info
+*.tsbuildinfo
+
+# Docker override files with local secrets (keep coolify + amd64 overrides)
+docker-compose.override.yml
+
+# Auth credential files — treat like passwords, never commit
+auth.json
+.credentials.json
+oauth_creds.json
+
+# Git worktrees
+.worktrees/
+
+# Superpowers brainstorm artifacts
+.superpowers/
+
+# Deck frontend build artifacts
+deck/dist/
+deck/node_modules/
+
+# Widget build artifacts
+widget/node_modules/
+widget/dist/
+
+# Knowledge base — private/sensitive files (PII, customer data)
+# Pattern fragile değil: hem .gizli hem isimle private/customer dosyaları kapatır
+knowledge/.*
+knowledge/customer*
+knowledge/*-private*
+knowledge/*.private.*
+
+# Generic private overrides — herhangi bir dosya .private. ekiyle ignore edilir
+**/*.private.*
+
+# Auth dump dosyaları (Coolify deploy için yapıştırılan auth.json içerikleri)
+**/auth-dump.*
+**/*.auth.json
+
+# AI agent / dev tool config'leri — kişisel/proje-özel, public repo'da gereksiz
+# Claude Code
+.claude/
+CLAUDE.md
+# Universal AI agent talimatları
+AGENTS.md
+# GitHub Copilot
+.github/copilot-instructions.md
+# Gemini CLI
+GEMINI.md
+.gemini/
+# Cursor
+.cursor/
+.cursorrules
+.cursorignore
+# Windsurf
+.windsurf/
+.windsurfrules
+# Aider
+.aider*
+# Continue
+.continue/
+# OpenAI Codex CLI
+.codex/
+# Sourcegraph Cody
+.sourcegraph/
+# OpenCode
+.opencode/

@@ -1,0 +1,6 @@
+services:
+  gateway:
+    platform: linux/amd64
+
+  gateway-dev:
+    platform: linux/amd64
