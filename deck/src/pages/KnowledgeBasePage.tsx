@@ -255,31 +255,31 @@ export default function KnowledgeBasePage() {
                         <span>Asistanın kişiliği, kuralları, yasakları ve davranış talimatları</span>
                       </div>
                       <div className="flex gap-2">
-                        <span className="w-36 shrink-0 font-medium text-black dark:text-white">hizmetler.md</span>
+                        <span className="w-36 shrink-0 font-medium text-black dark:text-white">services.md</span>
                         <span>Sunulan hizmetlerin detaylı açıklamaları</span>
                       </div>
                       <div className="flex gap-2">
-                        <span className="w-36 shrink-0 font-medium text-black dark:text-white">fiyatlandirma.md</span>
+                        <span className="w-36 shrink-0 font-medium text-black dark:text-white">pricing.md</span>
                         <span>Paketler, fiyat aralıkları, ödeme planları</span>
                       </div>
                       <div className="flex gap-2">
-                        <span className="w-36 shrink-0 font-medium text-black dark:text-white">sss.md</span>
+                        <span className="w-36 shrink-0 font-medium text-black dark:text-white">faq.md</span>
                         <span>Sık sorulan sorular ve standart cevaplar</span>
                       </div>
                       <div className="flex gap-2">
-                        <span className="w-36 shrink-0 font-medium text-black dark:text-white">teknolojiler.md</span>
+                        <span className="w-36 shrink-0 font-medium text-black dark:text-white">technologies.md</span>
                         <span>Kullanılan teknoloji stack&apos;i</span>
                       </div>
                       <div className="flex gap-2">
-                        <span className="w-36 shrink-0 font-medium text-black dark:text-white">surec.md</span>
+                        <span className="w-36 shrink-0 font-medium text-black dark:text-white">process.md</span>
                         <span>Çalışma süreci, fazlar, teslim adımları</span>
                       </div>
                       <div className="flex gap-2">
-                        <span className="w-36 shrink-0 font-medium text-black dark:text-white">referanslar.md</span>
+                        <span className="w-36 shrink-0 font-medium text-black dark:text-white">references.md</span>
                         <span>Referans projeler ve sektörel deneyim</span>
                       </div>
                       <div className="flex gap-2">
-                        <span className="w-36 shrink-0 font-medium text-black dark:text-white">hakkimizda.md</span>
+                        <span className="w-36 shrink-0 font-medium text-black dark:text-white">about.md</span>
                         <span>Firma bilgileri, iletişim, rakamlar</span>
                       </div>
                     </div>

@@ -19,14 +19,14 @@
   <a href="https://nodejs.org"><img alt="Node ≥ 22" src="https://img.shields.io/badge/node-%E2%89%A522-brightgreen.svg"></a>
   <img alt="TypeScript" src="https://img.shields.io/badge/typescript-5.8-3178c6.svg?logo=typescript&logoColor=white">
   <img alt="Fastify" src="https://img.shields.io/badge/fastify-5.x-000000.svg?logo=fastify&logoColor=white">
-  <a href="https://chat.varien.software"><img alt="Live demo" src="https://img.shields.io/badge/live-chat.varien.software-7c3aed.svg"></a>
+  <img alt="Self-hosted" src="https://img.shields.io/badge/deployment-self--hosted-orange.svg">
 </p>
 
 ---
 
 ## What it is
 
-A self-hosted gateway that turns any LLM provider (OpenAI Codex, Anthropic
+A **self-hosted** gateway that turns any LLM provider (OpenAI Codex, Anthropic
 Claude, Google Gemini) into a chat widget you can embed on any website with
 a single `<script>` tag. The gateway streams responses over Server-Sent
 Events, augments every prompt with a markdown-based knowledge base, and ships
@@ -36,8 +36,17 @@ needed to change theme, system prompt, rate limits, or active provider.
 Built for product teams who want a branded support assistant without writing
 LLM glue code.
 
-> **Live demo:** [chat.varien.software](https://chat.varien.software) — the
-> assistant running on Varien Software's own marketing site.
+> ### ⚠️ This is a self-hosted project
+>
+> **There is no public hosted version.** You deploy your own gateway and
+> point your widget at it.
+>
+> The URL `https://chat.varien.software` that appears in some examples is
+> Varien Software's own production API endpoint — it will reject requests
+> that don't carry a Varien-issued token. **Do not use it as your gateway
+> URL.** Replace every `chat.varien.software` reference with the hostname of
+> your own deployment (e.g. `chat.your-domain.com`, `ai-gateway.internal`,
+> `localhost:3000`).
 
 ## Features
 
@@ -147,13 +156,18 @@ prompt. The shipped layout:
 | File                  | Purpose                                          |
 | --------------------- | ------------------------------------------------ |
 | `system-prompt.md`    | Assistant personality, rules, escalation paths   |
-| `hizmetler.md`        | Services you offer                               |
-| `fiyatlandirma.md`    | Pricing                                          |
-| `sss.md`              | Frequently asked questions                       |
-| `teknolojiler.md`     | Tech stack you use                               |
-| `surec.md`            | Your delivery process                            |
-| `referanslar.md`      | Past clients / references                        |
-| `hakkimizda.md`       | Company overview                                 |
+| `services.md`         | Services you offer                               |
+| `pricing.md`          | Pricing                                          |
+| `faq.md`              | Frequently asked questions                       |
+| `technologies.md`     | Tech stack you use                               |
+| `process.md`          | Your delivery process                            |
+| `references.md`       | Past clients / references                        |
+| `about.md`            | Company overview                                 |
+
+> **All files except `system-prompt.md` ship as templates** containing
+> placeholder content and instructions. Replace them with your own
+> information before deploying — the assistant will quote whatever it sees
+> in this directory.
 
 Total budget is ~50K characters; the gateway truncates from the bottom if
 exceeded. Files are also editable from the Deck **Knowledge** tab — changes
