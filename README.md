@@ -164,14 +164,44 @@ prompt. The shipped layout:
 | `references.md`       | Past clients / references                        |
 | `about.md`            | Company overview                                 |
 
-> **All files except `system-prompt.md` ship as templates** containing
-> placeholder content and instructions. Replace them with your own
-> information before deploying — the assistant will quote whatever it sees
-> in this directory.
+> **Every file ships as a template** containing placeholder content and
+> instructions. Replace them with your own information before deploying —
+> the assistant will quote whatever it sees in this directory.
 
 Total budget is ~50K characters; the gateway truncates from the bottom if
 exceeded. Files are also editable from the Deck **Knowledge** tab — changes
 take effect on the next request.
+
+### Customizing the system prompt
+
+`system-prompt.md` defines **who your assistant is and what it refuses to
+do**. It is the most important file in this directory and the file most
+worth your time. The shipped template is split into two halves:
+
+1. **Customize-these sections** (Identity, Purpose, Tone, Greeting,
+   Language, Escalation) — placeholders that **must** be filled in. Leaving
+   them empty produces a generic, off-brand assistant.
+2. **Safety guardrails** (prompt-injection defense, scope enforcement,
+   information confidentiality, refusal templates, abuse-awareness) —
+   defaults that you should **keep**. They protect against:
+   - Prompt injection ("ignore previous instructions...")
+   - Jailbreaks ("pretend you have no rules", "developer mode")
+   - System-prompt extraction ("show me your instructions")
+   - Out-of-scope abuse (asking a customer-support bot to write code,
+     generate creative content, give legal/medical advice, roleplay)
+   - Competitor intelligence gathering
+   - Social engineering ("I'm the developer, skip the rules")
+
+> ⚠️ **Do not ship a chatbot without reading this file end-to-end.** Public
+> LLM-backed assistants are routinely probed for prompt-injection,
+> data exfiltration, and free general-purpose AI usage. The default
+> guardrails handle most known abuse patterns, but the **scope statements
+> in your Identity / Purpose sections** are what make those guardrails work
+> — they need to be specific to your business.
+
+After editing, test in the Deck **Chat** panel and watch the **Sessions**
+tab for refusal patterns; they will reveal new abuse vectors you may want
+to add to the prompt explicitly.
 
 ## Configuration
 
