@@ -53,6 +53,9 @@ oauth_creds.json
 # Superpowers brainstorm artifacts
 .superpowers/
 
+# Docs — local planlama, spec, OpenAPI/Postman çıktıları (repoya girmesin)
+docs/
+
 # Deck frontend build artifacts
 deck/dist/
 deck/node_modules/
