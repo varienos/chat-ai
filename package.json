@@ -1,7 +1,7 @@
 {
   "name": "varien-ai-gateway",
   "version": "0.1.0",
-  "description": "Embeddable, multi-provider AI chat assistant gateway (Codex / Claude / Gemini) with knowledge base and admin panel.",
+  "description": "Self-hosted Codex AI chat gateway with an embeddable widget, knowledge base, Deck admin panel, OpenAPI, and Docker/Coolify deployment.",
   "private": true,
   "license": "MIT",
   "author": {
@@ -25,10 +25,12 @@
     "fastify",
     "openai",
     "codex",
-    "claude",
-    "gemini",
+    "codex-cli",
     "embeddable-widget",
     "knowledge-base",
+    "openapi",
+    "coolify",
+    "self-hosted",
     "sse",
     "typescript"
   ],

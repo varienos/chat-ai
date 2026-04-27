@@ -51,6 +51,11 @@ LLM glue code.
 > endpoint and will reject requests without a Varien-issued token. Use the
 > hostname of your own deployment instead.
 
+## Live Example
+
+- **Widget:** https://varien.software
+- **API:** https://varien.software/varien-ai
+
 ## Features
 
 - 🔌 **Codex provider** — Use Codex through the CLI with subscription/OAuth
@@ -389,6 +394,13 @@ opening a public issue.
 
 `.env`, auth dumps, and customer/PII files are kept out of the repo by
 [`.gitignore`](.gitignore). Never commit secrets.
+
+## Community
+
+- Contributions: [`CONTRIBUTING.md`](CONTRIBUTING.md)
+- Support: [`SUPPORT.md`](SUPPORT.md)
+- Code of conduct: [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md)
+- Security policy: [`SECURITY.md`](SECURITY.md)
 
 ## License
 

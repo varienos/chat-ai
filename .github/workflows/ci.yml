@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  test:
+    name: Build and test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install root dependencies
+        run: npm ci
+
+      - name: Typecheck gateway
+        run: npm run build
+
+      - name: Test gateway
+        run: npm test
+
+      - name: Build Deck
+        run: npm run build:deck
+
+      - name: Build widget
+        run: |
+          cd widget
+          npm ci
+          npm run build
+

@@ -1,0 +1,9 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security vulnerability
+    url: mailto:yigitcan@varien.com.tr
+    about: Please report vulnerabilities privately by email.
+  - name: Varien Software
+    url: https://varien.software
+    about: Commercial support and company contact.
+
