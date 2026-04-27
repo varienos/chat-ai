@@ -8,6 +8,12 @@ dist/
 .env
 .env.local
 .env.*.local
+.env.*
+!.env.example
+!.env.sample
+!.env.template
+.envrc
+.direnv/
 
 # macOS
 .DS_Store
@@ -77,6 +83,9 @@ CLAUDE.md
 AGENTS.md
 # GitHub Copilot
 .github/copilot-instructions.md
+.github/instructions/
+.github/prompts/
+.github/chatmodes/
 # Gemini CLI
 GEMINI.md
 .gemini/
