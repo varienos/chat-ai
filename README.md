@@ -1,7 +1,7 @@
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="varien-dark-logo.png">
-    <img src="varien-light-logo.png" alt="Varien Software" width="280">
+    <source media="(prefers-color-scheme: dark)" srcset="varien-light-logo.png">
+    <img src="varien-dark-logo.png" alt="Varien Software" width="280">
   </picture>
 </p>
 
@@ -10,8 +10,8 @@
 </h1>
 
 <p align="center">
-  <strong>Embeddable, multi-provider AI chat assistant for any website.</strong><br>
-  <em>One script tag. Codex, Claude, or Gemini under the hood. Knowledge base + admin panel included.</em>
+  <strong>Embeddable AI chat assistant for any website.</strong><br>
+  <em>One script tag. Codex CLI/API today; Claude and Gemini support in progress. Knowledge base + admin panel included.</em>
 </p>
 
 <p align="center">
@@ -26,12 +26,18 @@
 
 ## What it is
 
-A **self-hosted** gateway that turns any LLM provider (OpenAI Codex, Anthropic
-Claude, Google Gemini) into a chat widget you can embed on any website with
-a single `<script>` tag. The gateway streams responses over Server-Sent
-Events, augments every prompt with a markdown-based knowledge base, and ships
-with a full admin panel ("Deck") for runtime configuration — no redeploys
-needed to change theme, system prompt, rate limits, or active provider.
+A **self-hosted** gateway that turns OpenAI Codex into a chat widget you can
+embed on any website with a single `<script>` tag. The gateway streams
+responses over Server-Sent Events, augments every prompt with a markdown-based
+knowledge base, and ships with a full admin panel ("Deck") for runtime
+configuration — no redeploys needed to change theme, system prompt, or rate
+limits.
+
+Codex works in two modes: through the Codex CLI using a logged-in
+subscription/OAuth session, or through the OpenAI API when
+`CODEX_AUTH_MODE=api_key`. An API key is only required for the API-key mode.
+Claude and Gemini provider work is present in the codebase but still in
+development.
 
 Built for product teams who want a branded support assistant without writing
 LLM glue code.
@@ -41,17 +47,16 @@ LLM glue code.
 > **There is no public hosted version.** You deploy your own gateway and
 > point your widget at it.
 >
-> The URL `https://chat.varien.software` that appears in some examples is
-> Varien Software's own production API endpoint — it will reject requests
-> that don't carry a Varien-issued token. **Do not use it as your gateway
-> URL.** Replace every `chat.varien.software` reference with the hostname of
-> your own deployment (e.g. `chat.your-domain.com`, `ai-gateway.internal`,
-> `localhost:3000`).
+> `https://chat.varien.software` is Varien Software's own production API
+> endpoint and will reject requests without a Varien-issued token. Use the
+> hostname of your own deployment instead.
 
 ## Features
 
-- 🔌 **Provider abstraction** — Codex (OpenAI), Claude (Anthropic), and
-  Gemini (Google) behind one API. Switch the active provider at runtime.
+- 🔌 **Codex provider** — Use Codex through the CLI with subscription/OAuth
+  auth, or through the OpenAI API with an API key.
+- 🧩 **Provider-ready architecture** — Claude (Anthropic) and Gemini (Google)
+  integrations are in development.
 - 📚 **Knowledge base** — Drop markdown files into `knowledge/`; they are
   injected into every prompt. Editable live from the admin panel (≤ 50K chars).
 - ⚡ **SSE streaming** — Token-by-token streaming for both the embedded
@@ -78,7 +83,7 @@ LLM glue code.
        ┌──────────────────────────────────────────────────────────┐
        │                  Fastify Gateway (Node 22)               │
        │                                                          │
-       │   Provider Abstraction  →  Codex │ Claude │ Gemini       │
+       │   Provider Layer  →  Codex CLI/API │ Claude/Gemini WIP   │
        │   Knowledge Base (md)   │  Sessions │ Auth │ Rate Limit  │
        └──────────┬─────────────────────────────────────┬─────────┘
                   ▼                                     ▼
@@ -113,20 +118,30 @@ Then verify the stack is up:
 > section into any local HTML file, or use the live test console at
 > **Deck → Chat**.
 
-For host-native development on macOS (faster than Docker for the gateway):
+For a host-native gateway run on macOS (faster than running the gateway in
+Docker):
 
 ```bash
 npm install
-npm run local:host:start       # 1. start postgres + redis (Docker, in background)
-npm run dev                    # 2. gateway in watch mode (port 3000)
-npm run dev:deck               # 3. deck panel in another terminal (port 5173)
+npm run local:host:start       # starts postgres + redis, builds the gateway, then runs it on port 3020
+npm run local:host:status      # optional: verify the background gateway
 
 # When done:
 npm run local:host:stop
 ```
 
-> The gateway will fail to start if PostgreSQL / Redis aren't running yet —
-> always run `local:host:start` first.
+The fallback gateway URL is `http://127.0.0.1:3020` by default. Override it
+with `HOST_FALLBACK_PORT` if needed.
+
+For watch-mode development:
+
+```bash
+docker compose up -d postgres redis
+npm run dev                    # gateway in watch mode (port 3000)
+npm run dev:deck               # deck panel in another terminal (port 5173)
+```
+
+> The gateway will fail to start if PostgreSQL / Redis aren't running yet.
 
 ## Embed the Widget
 
@@ -157,6 +172,10 @@ Sign in at `/deck` with `DECK_ADMIN_USER` / `DECK_ADMIN_PASSWORD`. Inside:
 | **Widget**       | Theme, colors, icon, position, embed snippet generator                       |
 
 All settings persist in PostgreSQL and apply at the next request — no restart.
+
+### Deck dashboard preview
+
+![Deck dashboard example view](ss-dashboard.gif)
 
 ## Knowledge Base
 
@@ -231,12 +250,13 @@ for the complete list. The most important ones:
 | `RATE_LIMIT_MAX_REQUESTS` | `30`                          | Per IP per window                           |
 | `RATE_LIMIT_WINDOW_MS`    | `60000`                       | Rate limit window                           |
 | `SYSTEM_PROMPT`           | _(see `.env.example`)_        | Overrides the default assistant persona     |
+| `CODEX_AUTH_MODE`         | `oauth`                       | `oauth` for CLI/subscription auth; `api_key` for OpenAI API |
 | `CODEX_MODEL`             | `gpt-5.4`                     | Model name passed to the Codex CLI          |
-| `OPENAI_API_KEY`          | _(empty)_                     | Required when `CODEX_AUTH_MODE=api_key`     |
+| `OPENAI_API_KEY`          | _(empty)_                     | Only required when `CODEX_AUTH_MODE=api_key` |
 
-Provider-specific auth (Codex / Gemini / Claude) can be supplied either as
-mounted CLI auth files (local Docker) or as JSON pasted into
-`*_AUTH_JSON` env vars (Coolify / headless deploy).
+Codex CLI auth can be supplied as a mounted CLI auth file (local Docker) or as
+`CODEX_AUTH_JSON` (Coolify / headless deploy). Gemini and Claude auth
+variables exist for the in-progress provider work.
 
 ## API Reference
 
@@ -257,20 +277,29 @@ Full schema at `/openapi.json`; interactive docs at `/docs` (Swagger UI).
 
 | Method | Path                         | Description                            |
 | ------ | ---------------------------- | -------------------------------------- |
+| GET    | `/api/providers`             | List enabled providers                 |
+| POST   | `/api/providers/:provider/login-status` | Check provider auth status    |
+| POST   | `/api/chat`                  | Chat completion (JSON response)        |
 | POST   | `/api/chat/stream`           | Chat completion (SSE streaming)        |
 | POST   | `/api/session`               | Create a new session                   |
+| GET    | `/api/session/:id`           | Fetch a session by id                  |
 | GET    | `/metrics`                   | Internal metrics                       |
 
-### Deck (JWT cookie, set by `/deck/api/login`)
+### Deck (JWT cookie, set by `/deck/api/auth/login`)
 
 | Method     | Path                                         | Description              |
 | ---------- | -------------------------------------------- | ------------------------ |
+| POST       | `/deck/api/auth/login`                       | Sign in                  |
+| POST       | `/deck/api/auth/logout`                      | Sign out                 |
+| GET        | `/deck/api/auth/me`                          | Current admin user       |
 | GET, PATCH | `/deck/api/settings`                         | Read / update settings   |
 | GET        | `/deck/api/sessions`                         | List sessions            |
+| GET        | `/deck/api/sessions/stats`                   | Session statistics       |
 | GET        | `/deck/api/sessions/:id`                     | Single session detail    |
 | GET        | `/deck/api/knowledge`                        | List knowledge files     |
 | GET, PUT, DELETE | `/deck/api/knowledge/:filename`        | CRUD a knowledge file    |
 | POST       | `/deck/api/chat/stream`                      | Live test chat           |
+| GET        | `/deck/api/openapi-spec`                     | OpenAPI spec for Deck    |
 
 ## Development
 
@@ -295,20 +324,26 @@ The repo ships with [`docker-compose.coolify.yml`](docker-compose.coolify.yml)
 preconfigured for Coolify + Traefik with Let's Encrypt. Required Coolify
 secrets:
 
+Before deploying, replace every `chat.varien.software` reference in
+[`docker-compose.coolify.yml`](docker-compose.coolify.yml) with your own
+Coolify domain. This includes the example comments and the Traefik
+`Host(...)` labels.
+
 ```
 API_AUTH_TOKEN          long random token (≥ 32 chars)
 DECK_ADMIN_PASSWORD     admin panel password
 DECK_JWT_SECRET         ≥ 32 chars
 DATABASE_URL            from a Coolify-attached PostgreSQL resource
 REDIS_URL               from a Coolify-attached Redis resource
-CODEX_AUTH_JSON         contents of ~/.codex/auth.json (if using Codex)
+CODEX_AUTH_JSON         contents of ~/.codex/auth.json (if using Codex CLI/OAuth)
 ```
 
 Optional:
 
 ```
-GEMINI_AUTH_JSON        contents of ~/.gemini/oauth_creds.json
-CLAUDE_AUTH_JSON        contents of ~/.claude/.credentials.json
+OPENAI_API_KEY          required only when CODEX_AUTH_MODE=api_key
+GEMINI_AUTH_JSON        contents of ~/.gemini/oauth_creds.json (provider WIP)
+CLAUDE_AUTH_JSON        contents of ~/.claude/.credentials.json (provider WIP)
 ENABLED_PROVIDERS       e.g. codex,claude,gemini
 KNOWLEDGE_SYNC_ON_DEPLOY=true
 ```
@@ -363,12 +398,3 @@ opening a public issue.
 
 Built and maintained by **Yiğit Can H.** ([@varienos](https://github.com/varienos))
 at [Varien Software](https://varien.software).
-
-<p align="center">
-  <a href="https://varien.software">
-    <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="varien-dark-logo.png">
-      <img src="varien-light-logo.png" alt="Varien Software" width="160">
-    </picture>
-  </a>
-</p>
